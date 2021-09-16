@@ -6,7 +6,7 @@ const queue = new Map();//queue(message.quild.id, queue_constructor object {vc, 
 
 module.exports = {
     name: 'play',
-    aliases: ['p', 'skip', 'stop', 'leave'],
+    aliases: ['p', 'skip', 'stop', 'leave', 'queue', 'show', 'q'],
     description: "joins vc and plays music from yt",
     async execute(message, args, cmd, client, Discord) {
 
@@ -76,15 +76,26 @@ module.exports = {
         }
         else if (cmd == 'skip') skipSong(message, serverQueue);
         else if (cmd == 'stop' || cmd == 'leave') leaveVC(message, serverQueue);
-
+        else if (cmd == 'show' || cmd == 'queue' || cmd == 'q') {
+            if (args && /^\d+$/.test(args[0])) {
+                var num = Math.min(parseInt(args[0], 10), 20);
+            }
+            else {
+                var num = 5;
+            }
+            printQueue(message, serverQueue, num);
+        }
+        //else if (cmd == 'move' || cmd == 'm')
+        //else if (cmd == 'stack' || cmd == 's')
+        //else if (cmd == 'remove' || cmd == 'r')
     }
 }
 
 const videoPlayer = async (guild, song) => {
     const songQueue = queue.get(guild.id);
-    message.channel.send(':wave:');
-    if (!song) {
 
+    if (!song) {
+        songQueue.textChannel.send(':wave:');
         songQueue.voiceChannel.leave();
         queue.delete(guild.id);
         return;
@@ -101,17 +112,36 @@ const videoPlayer = async (guild, song) => {
 }
 
 const skipSong = (message, serverQueue) => {
+    //user must be in vc
     if (!message.member.voice.channel) return message.channel.send('Must be in a voice channel to boss around the musical man!')
+    //if there is no queue
     if (!serverQueue) {
         return message.channel.send('The queue is empty!');
     }
-    message.channel.send(':wave:');
+    //end current song
     serverQueue.connection.dispatcher.end();
 }
 
 const leaveVC = (message, serverQueue) => {
+    //use must be in vc
     if (!message.member.voice.channel) return message.channel.send('Must be in a voice channel to boss around the musical man!');
-    serverQueue.songs = [];
-    serverQueue.connection.dispatcher.end();
-    message.channel.send(':wave:');
+    //if any songs queued, destroy them
+    if (serverQueue) serverQueue.songs = [];
+    //if bot in vc, leave and say goodbye
+    if (message.member.voice.connection) {
+        serverQueue.connection.dispatcher.end();
+        message.channel.send(':wave:');
+    }
+}
+
+const printQueue = (message, serverQueue, num) => {
+    //default is 5 entries, prints out NUM
+    for (let i = 0; i < num; i++) {
+        try {
+            message.channel.send("```" + (i + 1) + ": " + serverQueue.songs[i].title + "```");
+        }
+        catch {
+            message.channel.send("```" + (i + 1) + ": -------------```");
+        }
+    }
 }
