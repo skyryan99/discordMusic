@@ -1,7 +1,7 @@
 // JS index
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const token = 'ODg3OTY3ODMyNzk5ODcxMDE2.YUL2fA.X4jm42JgvbQJkA1YwE6QYUYF1YQ';
+const token = 'token';
 const prefix = '-';
 const fs = require('fs');
 
