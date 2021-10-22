@@ -16,7 +16,7 @@ module.exports = {
             + '~~**-remove, -r**: Takes a song out of the queue~~\n\n'
             + '**-leave, -stop**: Yeets musical man out of the channel\n\n'
             + '*MORE TO COME...*\n\n'
-            + 'P.S. For any bug reports, pm SwankyMango#1457} with details');
+            + 'P.S. For any bug reports, pm SwankyMango#1457 with details');
 
     }
 }
