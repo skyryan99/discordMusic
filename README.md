@@ -11,7 +11,7 @@ known issues:
 to be implemented:
 
 * ***move***, ***stack***, ***remove*** commands
-* change ***queue*** to diaply songs in a single message
+* change ***queue*** to display songs in a single message
 * add clickable url to all song titles
 * support for spotify/soundcloud/other services
 * support for playlists
