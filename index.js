@@ -1,7 +1,7 @@
 // JS index
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const token = 'token';
+const token = process.env.token;
 const prefix = '-';
 const fs = require('fs');
 
@@ -36,3 +36,4 @@ client.on('message', message => {
 
 
 client.login(token);
+require("http").createServer((_, res) => res.end("Alive")).listen(8080)
