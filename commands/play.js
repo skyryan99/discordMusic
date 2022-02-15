@@ -13,7 +13,7 @@ module.exports = {
         var voiceChannel = message.member.voice.channel;
 
         //Make sure user is in vc
-        if (!voiceChannel) return message.channel.send('Must be in a voice channel to summon the musical man!');
+        if (!voiceChannel) return message.channel.send('Must be in a voice channel to interact with the musical man!');
         const permissions = voiceChannel.permissionsFor(message.client.user);
         //Make sure user has appropriate permissions
         if (!permissions.has('CONNECT')) return message.channel.send('You do not have permission to join this channel');
@@ -57,7 +57,7 @@ module.exports = {
 
                 queue.set(message.guild.id, queueConstructor);
                 queueConstructor.songs.push(song);
-                message.channel.send(`***${song.title}*** added to queue!`);
+                message.channel.send(`***${song.title}: (${song.url})*** added to queue!`);
 
                 try {
                     const connection = await voiceChannel.join();
@@ -71,7 +71,7 @@ module.exports = {
             }
             else {
                 serverQueue.songs.push(song);
-                return message.channel.send(`***${song.title}*** added to queue!`);
+                return message.channel.send(`***${song.title}: (${song.url})*** added to queue!`);
             }
         }
         else if (cmd == 'skip') skipSong(message, serverQueue);
@@ -101,7 +101,7 @@ const videoPlayer = async (guild, song) => {
         return;
     }
     else {
-        await songQueue.textChannel.send(`:musical_note: Now Playing ***${song.title}*** :musical_note:`);
+        await songQueue.textChannel.send(`:musical_note: Now Playing ***${song.title}: (${song.url})*** :musical_note:`);
         const stream = ytdl(song.url, { filter: 'audioonly' });
         songQueue.connection.play(stream, { seek: 0, volume: 1 })
             .on('finish', () => {
@@ -126,22 +126,28 @@ const leaveVC = (message, serverQueue) => {
     //use must be in vc
     if (!message.member.voice.channel) return message.channel.send('Must be in a voice channel to boss around the musical man!');
     //if any songs queued, destroy them
-    if (serverQueue) serverQueue.songs = [];
-    //if bot in vc, leave and say goodbye
-    if (message.member.voice.connection) {
+    if (serverQueue) {
+      serverQueue.songs = [];
+      if (serverQueue.connection.dispatcher) {
         serverQueue.connection.dispatcher.end();
-        message.channel.send(':wave:');
+      }
+      serverQueue.connection = null;
     }
 }
 
 const printQueue = (message, serverQueue, num) => {
     //default is 5 entries, prints out NUM
+    var songs = ""
     for (let i = 0; i < num; i++) {
-        try {
-            message.channel.send("```" + (i + 1) + ": " + serverQueue.songs[i].title + "```");
-        }
-        catch {
-            message.channel.send("```" + (i + 1) + ": -------------```");
-        }
+      try {
+        songs += String(i + 1) + ": " + serverQueue.songs[i].title
+      }
+      catch {
+        songs += String(i + 1) + ": " + "-------------"
+      }
+      if (i < num - 1) {
+        songs += "\n"
+      }
     }
+      message.channel.send("```" + songs + "```");
 }
